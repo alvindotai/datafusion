@@ -39,10 +39,7 @@ use datafusion_common::{
     internal_datafusion_err, internal_err, not_impl_err, plan_err, Column, Result,
     ScalarValue,
 };
-use datafusion_expr::{
-    expr::{Alias, Exists, InList, ScalarFunction, Sort, WindowFunction},
-    Between, BinaryExpr, Case, Cast, Expr, GroupingSet, Like, Operator, TryCast,
-};
+use datafusion_expr::{expr::{Alias, Exists, InList, ScalarFunction, Sort, WindowFunction}, Between, BinaryExpr, Case, Cast, Expr, GroupingSet, Like, Operator, ScalarUDF, TryCast};
 use sqlparser::ast::helpers::attached_token::AttachedToken;
 use sqlparser::tokenizer::Span;
 
@@ -584,6 +581,17 @@ impl Unparser<'_> {
                 ast::Expr::CompoundIdentifier(idents) => idents,
                 other => return internal_err!("expected col_to_sql to return an Identifier or CompoundIdentifier, but received: {:?}", other),
             },
+            Expr::ScalarFunction(ScalarFunction { func, args, .. }) => {
+                if func.name() != "get_field" {
+                    return internal_err!("get_field expects first argument to be column, but received: get_field");
+                }
+                match self.get_field_to_sql(&args)? {
+                    ast::Expr::CompoundIdentifier(id) => {
+                        id
+                    }
+                    _ => return internal_err!("get_field expects first argument to be column, but received: {:?}", &args[0]),
+                }
+            }
             _ => return internal_err!("get_field expects first argument to be column, but received: {:?}", &args[0]),
         };
 
