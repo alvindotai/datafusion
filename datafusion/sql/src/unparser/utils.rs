@@ -107,8 +107,6 @@ pub(crate) fn find_unnest_node_until_relation(plan: &LogicalPlan) -> Option<&Unn
         None
     } else if let LogicalPlan::Subquery(_) = input {
         None
-    } else if let LogicalPlan::SubqueryAlias(_) = input {
-        None
     } else {
         find_unnest_node_within_select(input)
     }
