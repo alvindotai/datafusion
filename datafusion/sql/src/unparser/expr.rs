@@ -673,19 +673,20 @@ impl Unparser<'_> {
     }
 
     fn col_to_sql(&self, col: &Column) -> Result<ast::Expr> {
-        if let Some(table_ref) = &col.relation {
-            let mut id = if self.dialect.full_qualified_col() {
-                table_ref.to_vec()
-            } else {
-                vec![table_ref.table().to_string()]
-            };
-            id.push(col.name.to_string());
-            return Ok(ast::Expr::CompoundIdentifier(
-                id.iter()
-                    .map(|i| self.new_ident_quoted_if_needs(i.to_string()))
-                    .collect(),
-            ));
-        }
+        // TODO: SEE IF THIS CAN BE FIXED. This is context dependent, and in our usecase (Where we optimize before unparsing) this does not work well.
+        // if let Some(table_ref) = &col.relation {
+        //     let mut id = if self.dialect.full_qualified_col() {
+        //         table_ref.to_vec()
+        //     } else {
+        //         vec![table_ref.table().to_string()]
+        //     };
+        //     id.push(col.name.to_string());
+        //     return Ok(ast::Expr::CompoundIdentifier(
+        //         id.iter()
+        //             .map(|i| self.new_ident_quoted_if_needs(i.to_string()))
+        //             .collect(),
+        //     ));
+        // }
         Ok(ast::Expr::Identifier(
             self.new_ident_quoted_if_needs(col.name.to_string()),
         ))
