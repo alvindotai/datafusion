@@ -839,21 +839,24 @@ impl Unparser<'_> {
     /// - If the column is not a placeholder column, return [None].
     ///
     /// `outer_ref` is the display result of [Expr::OuterReferenceColumn]
-    pub fn check_unnest_placeholder_with_outer_ref(expr: &Expr) -> Option<UnnestInputType> {
+    pub fn check_unnest_placeholder_with_outer_ref(
+        expr: &Expr,
+    ) -> Option<UnnestInputType> {
         if let Expr::Alias(ref alias) = expr {
             if let Expr::Column(ref column) = *alias.expr {
                 if let Some(prefix) = column.name.strip_prefix(UNNEST_PLACEHOLDER) {
-                    if prefix.starts_with(&format!("({}(", OUTER_REFERENCE_COLUMN_PREFIX)) {
+                    if prefix.starts_with(&format!("({}(", OUTER_REFERENCE_COLUMN_PREFIX))
+                    {
                         return Some(UnnestInputType::OuterReference);
                     }
                     return Some(UnnestInputType::Scalar);
                 }
+            } else if let Expr::Alias(ref inner_alias) = *alias.expr {
+                return Self::check_unnest_placeholder_with_outer_ref(
+                    inner_alias.expr.as_ref(),
+                );
             }
-            else if let Expr::Alias(ref inner_alias) = *alias.expr {
-                return Self::check_unnest_placeholder_with_outer_ref(inner_alias.expr.as_ref());
-            }
-        }
-        else if let Expr::Column(ref column) = expr {
+        } else if let Expr::Column(ref column) = expr {
             if let Some(prefix) = column.name.strip_prefix(UNNEST_PLACEHOLDER) {
                 if prefix.starts_with(&format!("({}(", OUTER_REFERENCE_COLUMN_PREFIX)) {
                     return Some(UnnestInputType::OuterReference);
