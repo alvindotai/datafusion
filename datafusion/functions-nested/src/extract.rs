@@ -33,7 +33,7 @@ use datafusion_common::{
 };
 use datafusion_expr::{ArrayFunctionSignature, Expr, TypeSignature};
 use datafusion_expr::{
-    ColumnarValue, Documentation, NullHandling, ScalarUDFImpl, Signature, Volatility,
+    ColumnarValue, Documentation, ScalarUDFImpl, Signature, Volatility,
 };
 use datafusion_macros::user_doc;
 use std::any::Any;
@@ -331,11 +331,6 @@ impl ArraySlice {
                 vec![
                     TypeSignature::ArraySignature(
                         ArrayFunctionSignature::ArrayAndIndexes(
-                            NonZeroUsize::new(1).expect("1 is non-zero"),
-                        ),
-                    ),
-                    TypeSignature::ArraySignature(
-                        ArrayFunctionSignature::ArrayAndIndexes(
                             NonZeroUsize::new(2).expect("2 is non-zero"),
                         ),
                     ),
@@ -388,10 +383,6 @@ impl ScalarUDFImpl for ArraySlice {
 
     fn return_type(&self, arg_types: &[DataType]) -> Result<DataType> {
         Ok(arg_types[0].clone())
-    }
-
-    fn null_handling(&self) -> NullHandling {
-        NullHandling::Propagate
     }
 
     fn invoke_batch(
@@ -642,7 +633,7 @@ where
     Ok(Arc::new(GenericListArray::<O>::try_new(
         Arc::new(Field::new_list_field(array.value_type(), true)),
         OffsetBuffer::<O>::new(offsets.into()),
-        arrow_array::make_array(data),
+        arrow::array::make_array(data),
         null_builder.finish(),
     )?))
 }
@@ -693,10 +684,6 @@ impl ScalarUDFImpl for ArrayPopFront {
 
     fn return_type(&self, arg_types: &[DataType]) -> Result<DataType> {
         Ok(arg_types[0].clone())
-    }
-
-    fn null_handling(&self) -> NullHandling {
-        NullHandling::Propagate
     }
 
     fn invoke_batch(
@@ -797,10 +784,6 @@ impl ScalarUDFImpl for ArrayPopBack {
 
     fn return_type(&self, arg_types: &[DataType]) -> Result<DataType> {
         Ok(arg_types[0].clone())
-    }
-
-    fn null_handling(&self) -> NullHandling {
-        NullHandling::Propagate
     }
 
     fn invoke_batch(
