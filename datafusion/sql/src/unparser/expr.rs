@@ -39,7 +39,11 @@ use datafusion_common::{
     internal_datafusion_err, internal_err, not_impl_err, plan_err, Column, Result,
     ScalarValue,
 };
-use datafusion_expr::{expr::{Alias, Exists, InList, ScalarFunction, Sort, WindowFunction}, Between, BinaryExpr, Case, Cast, Expr, GroupingSet, Like, Operator, ScalarUDF, TryCast};
+use datafusion_expr::{
+    expr::{Alias, Exists, InList, ScalarFunction, Sort, WindowFunction},
+    Between, BinaryExpr, Case, Cast, Expr, GroupingSet, Like, Operator, ScalarUDF,
+    TryCast,
+};
 use sqlparser::ast::helpers::attached_token::AttachedToken;
 use sqlparser::tokenizer::Span;
 
