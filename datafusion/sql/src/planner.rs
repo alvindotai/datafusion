@@ -694,6 +694,13 @@ pub(crate) fn idents_to_table_reference(
             let catalog = taker.take();
             Ok(TableReference::full(catalog, schema, table))
         }
+        4 => {
+            let table_component1 = taker.take();
+            let table = format!("{}.{}", taker.take(), table_component1);
+            let schema = taker.take();
+            let catalog = taker.take();
+            Ok(TableReference::full(catalog, schema, table))
+        }
         _ => plan_err!(
             "Unsupported compound identifier '{}'. Expected 1, 2 or 3 parts, got {}",
             taker,
